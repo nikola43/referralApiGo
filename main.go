@@ -61,7 +61,7 @@ func InitializeHttpServer() {
 
 	HandleRoutes(httpServer)
 
-	httpServer.Listen(":3000")
+	httpServer.Listen(":2001")
 }
 
 func HandleRoutes(router fiber.Router) {
