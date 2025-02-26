@@ -34,8 +34,7 @@ func GetUser(address string) (*models.User, error) {
 	return user, nil
 }
 
-func AddReferral(req *models.AddReferralRequest) (*models.Referral, error) {
-
+func AddReferral(req *models.AddReferralRequest) (*models.User, error) {
 	// check if referrer and referee are the same
 	if req.ReferrerAddress == req.RefereeAddress {
 		return nil, errors.New("referrer and referee cannot be the same")
@@ -65,6 +64,7 @@ func AddReferral(req *models.AddReferralRequest) (*models.Referral, error) {
 		return nil, errors.New("referral already exists")
 	}
 
+	// Create new referral
 	referral = &models.Referral{
 		ReferrerID: ReferrerID,
 		RefereeID:  RefereeID,
@@ -77,13 +77,32 @@ func AddReferral(req *models.AddReferralRequest) (*models.Referral, error) {
 		return nil, tx.Error
 	}
 
-	// return referrer with all referrals
-	tx = db.GormDB.Preload("Referrals").Where("id = ?", ReferrerID)
+	// Fetch the updated user with all referrals
+	user := &models.User{}
+	tx = db.GormDB.Preload("Referrals.Referee").Where("address = ?", req.ReferrerAddress).First(user)
 	if tx.Error != nil {
 		return nil, tx.Error
 	}
 
-	return referral, nil
+	// Create a filtered version of the user with only the desired fields in referrals
+	filteredUser := &models.User{
+		ID:        user.ID,
+		Address:   user.Address,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		DeletedAt: user.DeletedAt,
+	}
+
+	// Add only the fields we want from each referral
+	for _, ref := range user.Referrals {
+		filteredReferral := models.Referral{
+			ID:      ref.ID,
+			Referee: ref.Referee,
+		}
+		filteredUser.Referrals = append(filteredUser.Referrals, filteredReferral)
+	}
+
+	return filteredUser, nil
 }
 
 func GetUserWithReferrals(address string) (*models.User, error) {
