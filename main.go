@@ -72,8 +72,6 @@ func HandleRoutes(router fiber.Router) {
 	})
 
 	// router.Get("/users", controllers.GetUser)
-	router.Get("/users", controllers.GetUserWithReferrals)
-	router.Post("/users", controllers.CreateUser)
+	router.Post("/users", controllers.GetOrCreate)
 	router.Post("/users/addReferral", controllers.AddReferral)
-
 }

@@ -1,5 +1,6 @@
 package models
 
 type CreateUserRequest struct {
-	Address string `json:"address" validate:"required"`
+	ReferrerAddress *string `json:"referrerAddress" validate:"required"`
+	ReferredAddress *string `json:"referredAddress"`
 }
