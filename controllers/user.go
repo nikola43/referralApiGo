@@ -34,19 +34,23 @@ func GetOrCreate(ctx *fiber.Ctx) error {
 		return utils.ErrorResponse(fiber.StatusBadRequest, err, ctx)
 	}
 
-	isReferrerAddressValid := utils.IsValidAddress(req.ReferrerAddress)
-	if !isReferrerAddressValid {
-		return utils.ErrorResponse(fiber.StatusBadRequest, fmt.Errorf("invalid referrer address"), ctx)
+	if req.ReferrerAddress != nil {
+		isReferrerAddressValid := utils.IsValidAddress(*req.ReferrerAddress)
+		if !isReferrerAddressValid {
+			return utils.ErrorResponse(fiber.StatusBadRequest, fmt.Errorf("invalid referrer address"), ctx)
+		}
 	}
 
-	isReferredAddressValid := utils.IsValidAddress(req.ReferredAddress)
-	if !isReferredAddressValid {
-		return utils.ErrorResponse(fiber.StatusBadRequest, fmt.Errorf("invalid referred address"), ctx)
+	if req.ReferredAddress != nil {
+		isReferredAddressValid := utils.IsValidAddress(*req.ReferredAddress)
+		if !isReferredAddressValid {
+			return utils.ErrorResponse(fiber.StatusBadRequest, fmt.Errorf("invalid referred address"), ctx)
+		}
 	}
 
 	tx, err := services.GetOrCreate(req)
 	if err != nil {
-		return utils.ErrorResponse(fiber.StatusInternalServerError, err, ctx)
+		return utils.ErrorResponse(fiber.StatusBadRequest, err, ctx)
 	}
 
 	return ctx.Status(fiber.StatusOK).JSON(tx)

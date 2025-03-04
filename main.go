@@ -70,8 +70,6 @@ func HandleRoutes(router fiber.Router) {
 			"status": "ok",
 		})
 	})
-
-	// router.Get("/users", controllers.GetUser)
+	
 	router.Post("/users", controllers.GetOrCreate)
-	router.Post("/users/addReferral", controllers.AddReferral)
 }

@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/nikola43/pdexrefapi/db"
@@ -108,13 +109,15 @@ func GetOrCreate(req *models.CreateUserRequest) (*models.User, error) {
 	// check if referred address is provided
 	if req.ReferredAddress != nil {
 		// check if referrer and referee are the same
-		if req.ReferrerAddress == req.ReferredAddress {
+		fmt.Println("referrer", req.ReferrerAddress)
+		fmt.Println("referred", req.ReferredAddress)
+		if *req.ReferrerAddress == *req.ReferredAddress {
 			return nil, errors.New("referrer and referred cannot be the same")
 		}
 
 		// Check if referred exists
 		referred := &models.User{}
-		tx = db.GormDB.Where("address = ?", req.ReferredAddress).First(referred)
+		tx = db.GormDB.Where("address = ?", *req.ReferredAddress).First(referred)
 		if tx.Error != nil {
 			return nil, tx.Error
 		}
